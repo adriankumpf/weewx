@@ -26,7 +26,7 @@ def vlimit(t):
 def tlimit(v):
     (WC_C1 - WC_C3 * pow(v, WC_E))/(1 - WC_C2 - WC_C4 * pow(v, WC_E));
 
-def calculate_temperature(windchill, windspeed):
+def calc_temperatureF_v1(windchill, windspeed):
     if windchill is None or windspeed is None:
         return None
 
@@ -82,7 +82,7 @@ class ExtraCalculations(weewx.engine.StdService):
             data_us['dewpoint4'] = weewx.wxformulas.dewpointF(data_us['extraTemp4'], data_us['extraHumid4'])
 
         if 'windchill' in data_us and 'windSpeed' in data_us:
-            data_us['roofTemp'] = calculate_temperature(data_us['windchill'], data_us['windSpeed'])
+            data_us['roofTemp'] = calc_temperatureF_v1(data_us['windchill'], data_us['windSpeed'])
 
         if 'windSpeed' in data_us and data_us['windSpeed'] is not None:
             data_us['windSpeed_BF'] = weewx.wxformulas.beaufort(data_us['windSpeed'] * CF)
