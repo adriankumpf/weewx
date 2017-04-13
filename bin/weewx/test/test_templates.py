@@ -110,7 +110,15 @@ class Common(unittest.TestCase):
 
         stn_info = weewx.station.StationInfo(**self.config_dict['Station'])
         
-        t = weewx.reportengine.StdReportEngine(self.config_dict, stn_info, testtime_ts)
+        # First run the engine without a current record.
+        self.run_engine(stn_info, None, testtime_ts)
+        with weewx.manager.open_manager_with_config(self.config_dict, 'wx_binding')  as manager:
+            record = manager.getRecord(testtime_ts)
+        # Now run the engine again, but this time with a current record:
+        self.run_engine(stn_info, record, testtime_ts)
+        
+    def run_engine(self, stn_info, record, testtime_ts):
+        t = weewx.reportengine.StdReportEngine(self.config_dict, stn_info, record, testtime_ts)
 
         # Find the test skins and then have SKIN_ROOT point to it:
         test_dir = sys.path[0]
@@ -144,9 +152,9 @@ class Common(unittest.TestCase):
                     expected_line = expected.readline()
                     if actual_line == '' or expected_line == '':
                         break
+                    n += 1
                     self.assertEqual(actual_line, expected_line, msg="%s[%d]:\n%r vs\n%r" % 
                                      (actual_filename_abs, n, actual_line, expected_line))
-                    n += 1
                 
                 print "Checked %d lines" % (n,)
 
